@@ -15,28 +15,92 @@ const gameBoardSizes = {
 type tGameBoardSizes = typeof gameBoardSizes;
 type tGameDifficulty = keyof tGameBoardSizes;
 
-type tTileDisplay = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | "Untouched" | "" | "Flag" | "Mine";
+type tTileDisplay = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | "Untouched" | "Flag" | "Mine";
 type tBoardCell = "" | "*";
+type tGameStates = "playing" | "won" | "lost";
 
 class MinesweeperGame {
     realBoard: tBoardCell[][];
     userBoard: tTileDisplay[][];
+    state: tGameStates;
 
     constructor(difficulty: tGameDifficulty = "normal") {
         this.userBoard = MinesweeperGame.makeEmptyBoard<tTileDisplay>("Untouched", gameBoardSizes[difficulty].rowNum, gameBoardSizes[difficulty].colNum);
         this.realBoard = MinesweeperGame.makeRealBoard(difficulty);
+        this.state = "playing";
 
         console.log("MinesweeperGame Constructor's Real Board", this.realBoard)
     }
 
-    /* Make the boards with all mines placed */
+    shortClick(rowNum: number, colNum: number): void {
+        const userCell = this.userBoard[rowNum][colNum];
+        const realCell = this.realBoard[rowNum][colNum];
+
+        if (userCell === "Untouched") {
+            if (realCell === "*") { //mine
+                this.state = "lost";
+                this.userBoard[rowNum][colNum] = "Mine";
+
+                console.log("You lost!")
+            } else { // blank
+                this.updateMineNums(rowNum, colNum);
+            }
+        }
+    }
+
+    longClick(rowNum: number, colNum: number): void {
+        const cell = this.userBoard[rowNum][colNum];
+
+        if (cell === "Untouched") this.userBoard[rowNum][colNum] = "Flag";
+        if (cell === "Flag") this.userBoard[rowNum][colNum] = "Untouched";
+    }
+
+    private updateMineNums(rowNum: number, colNum: number): void {
+        // Return if a mine
+        if (this.realBoard[rowNum][colNum] === "*") return;
+
+        // Update user board with mine count
+        const mineCount = this.countSurroundingMines(rowNum, colNum);
+
+        this.userBoard[rowNum][colNum] = mineCount;
+
+        // if the cell clicked is blank, aka 0, then we need to recursively check
+        // the other surrounding cells
+        if (mineCount === 0) {
+            const directions = [
+                [-1, -1], [-1, 0], [-1, 1], // top
+                [0, -1], [0, 1], // middle
+                [1, -1], [1, 0], [1, 1], // bottom
+            ];
+
+            for (const [dx, dy] of directions) {
+                const newRow = rowNum + dx;
+                const newCol = colNum + dy;
+
+                // Check boundaries and if the neighboring cell is a mine
+                if (
+                    newRow >= 0 && newRow < this.userBoard.length &&
+                    newCol >= 0 && newCol < this.userBoard[0].length &&
+                    this.realBoard[newRow][newCol] !== "*"
+                ) {
+                    if (this.userBoard[newRow][newCol] === "Untouched") {
+                        this.updateMineNums(newRow, newCol);
+                    }
+                }
+            }
+
+        }
+    }
+
+    /* Make the real board with all mines placed */
     static makeRealBoard(difficulty: tGameDifficulty): tBoardCell[][] {
         const {
             rowNum,
             colNum,
-            mineAmt } = gameBoardSizes[difficulty];
+            mineAmt
+        } = gameBoardSizes[difficulty];
 
-        const board =  MinesweeperGame.makeEmptyBoard<tBoardCell>("", rowNum, colNum);
+        const board = MinesweeperGame.makeEmptyBoard<tBoardCell>("", rowNum, colNum);
 
         let minesPlaced = 0;
 
@@ -55,15 +119,15 @@ class MinesweeperGame {
         return board;
     }
 
-    private static makeEmptyBoard <T> ( fillValue: T, rowNum: number, colNum: number): T[][]{
-         return Array.from({ length: rowNum }, () => Array(colNum).fill(fillValue));
+    private static makeEmptyBoard<T>(fillValue: T, rowNum: number, colNum: number): T[][] {
+        return Array.from({ length: rowNum }, () => Array(colNum).fill(fillValue));
     }
 
     static isMineSurrounded(board: tBoardCell[][], row: number, col: number): boolean {
         const directions = [
-            [-1, -1], [-1, 0], [-1, 1],
-            [0, -1], [0, 1],
-            [1, -1], [1, 0], [1, 1],
+            [-1, -1], [-1, 0], [-1, 1], // top
+            [0, -1], [0, 1], // middle
+            [1, -1], [1, 0], [1, 1], // bottom
         ];
 
         for (const [dx, dy] of directions) {
@@ -81,6 +145,34 @@ class MinesweeperGame {
         }
         return true;
     }
+
+    countSurroundingMines(row: number, col: number):
+        0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 {
+        const directions = [
+            [-1, -1], [-1, 0], [-1, 1], // top
+            [0, -1], [0, 1], // middle
+            [1, -1], [1, 0], [1, 1], // bottom
+        ];
+        const board = this.realBoard;
+
+        let mineCount = 0;
+        for (const [dx, dy] of directions) {
+            const newRow = row + dx;
+            const newCol = col + dy;
+
+            // Check boundaries and if the neighboring cell is a mine
+            if (
+                newRow >= 0 && newRow < board.length &&
+                newCol >= 0 && newCol < board[0].length &&
+                board[newRow][newCol] === "*"
+            ) {
+                mineCount++
+            }
+        }
+
+        return mineCount as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+    }
+
 }
 
 export { gameBoardSizes, MinesweeperGame, tBoardCell }

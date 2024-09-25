@@ -2,7 +2,6 @@ import { describe, test, expect } from 'vitest';
 import { MinesweeperGame, gameBoardSizes, tBoardCell } from "../minesweeperGame";
 
 
-
 describe("MinesweeperGame", function () {
 
     describe("isMineSurrounded", function () {
@@ -14,19 +13,19 @@ describe("MinesweeperGame", function () {
             ["", "", "", ""],
         ]
 
-        test("not surrounded", function (){
+        test("not surrounded", function () {
             expect(MinesweeperGame.isMineSurrounded(board, 1, 1)).toBeFalsy();
         })
 
-        test("fully surrounded", function (){
+        test("fully surrounded", function () {
             expect(MinesweeperGame.isMineSurrounded(board, 1, 2)).toBeTruthy();
         })
 
-        test("edge not surrounded", function (){
+        test("edge not surrounded", function () {
             expect(MinesweeperGame.isMineSurrounded(board, 0, 1)).toBeFalsy();
         })
 
-        test("edge fully surrounded", function (){
+        test("edge fully surrounded", function () {
             expect(MinesweeperGame.isMineSurrounded(board, 0, 2)).toBeTruthy();
         })
     })
@@ -110,6 +109,149 @@ describe("MinesweeperGame", function () {
                 }
             }
         });
+    });
+
+    describe("clicks", function () {
+        const game = new MinesweeperGame("easy");
+
+        game.realBoard = [
+            ["", "*", "", "*"],
+            ["", "*", "", "*"],
+            ["", "", "", "*"],
+            ["", "", "", ""],
+        ];
+        /*
+        * Winning Board
+        [
+            [2, "Mine", 4, "Mine"],
+            [2, "Mine", 5, "Mine"],
+            [1, 1, 3, "Mine"],
+            [0, 0, 1, 1],
+        ]
+        * */
+
+        game.userBoard = [
+            ["Untouched", "Untouched", "Untouched", "Untouched"],
+            ["Untouched", "Untouched", "Untouched", "Untouched"],
+            ["Untouched", "Untouched", "Untouched", "Untouched"],
+            ["Untouched", "Untouched", "Untouched", "Untouched"],
+        ];
+
+        describe("longClick", function () {
+            test("numbered cell", function () {
+                game.longClick(0, 0)
+
+                expect(game.userBoard).toEqual([
+                    ["Flag", "Untouched", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                ])
+            })
+
+            test("mine cell", function () {
+                game.longClick(0, 1)
+
+                expect(game.userBoard).toEqual([
+                    ["Flag", "Flag", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                ])
+            })
+            test("unflagging", function () {
+                game.longClick(0, 0)
+                game.longClick(0, 1)
+
+                expect(game.userBoard).toEqual([
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                ])
+            })
+        })
+
+        describe("shortClick", function () {
+
+            test("reveals all chained blanks when 1 blank (aka 0) is clicked", function () {
+
+                game.shortClick(3, 0) // bottom left
+                expect(game.userBoard).toEqual([
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    [1, 1, 3, "Untouched"],
+                    [0, 0, 1, "Untouched"],
+                ])
+            })
+
+            test("nothing happens if a revealed number is clicked", function () {
+
+                game.shortClick(3, 0)
+                game.shortClick(3, 1)
+                game.shortClick(3, 2)
+
+                expect(game.userBoard).toEqual([
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    [1, 1, 3, "Untouched"],
+                    [0, 0, 1, "Untouched"],
+                ])
+            })
+
+            test("no chain reaction if it has mines near it", function () {
+
+                game.shortClick(3, 3) // bottom RIGHT
+
+                expect(game.userBoard).toEqual([
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    ["Untouched", "Untouched", "Untouched", "Untouched"],
+                    [1, 1, 3, "Untouched"],
+                    [0, 0, 1, 1],
+                ])
+            })
+
+            test("remaining numbered cells", function () {
+
+                game.shortClick(0, 0);
+                game.shortClick(0, 2);
+                game.shortClick(1, 0);
+                game.shortClick(1, 2);
+
+                expect(game.userBoard).toEqual([
+                    [2, "Untouched", 4, "Untouched"],
+                    [2, "Untouched", 5, "Untouched"],
+                    [1, 1, 3, "Untouched"],
+                    [0, 0, 1, 1],
+                ])
+            })
+
+            test("can't short click a flagged cell", function (){
+                game.longClick(0, 3)
+                game.shortClick(0, 3)
+
+                expect(game.userBoard).toEqual([
+                    [2, "Untouched", 4, "Flag"],
+                    [2, "Untouched", 5, "Untouched"],
+                    [1, 1, 3, "Untouched"],
+                    [0, 0, 1, 1],
+                ])
+            })
+
+            test("Mine explosion", function () {
+
+                game.shortClick(0, 1);
+
+                expect(game.state).toEqual("lost")
+                expect(game.userBoard).toEqual([
+                    [2, "Mine", 4, "Flag"],
+                    [2, "Untouched", 5, "Untouched"],
+                    [1, 1, 3, "Untouched"],
+                    [0, 0, 1, 1],
+                ])
+            })
+        })
+
     });
 
 });
