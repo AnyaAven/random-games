@@ -6,8 +6,6 @@
   "type": "module",
   "scripts": {
     "start": "npx tsx server.ts",
-    "start:server": "NODE_ENV=production tsx --tsconfig ./src/server/tsconfig.json src/server/main.ts",
-    "start:debug": "node --inspect-brk main.js",
     "test": "../node_modules/.bin/vitest",
     "test:cov": "../node_modules/.bin/vitest --coverage"
   },
