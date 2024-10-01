@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { MinesweeperGame, gameBoardSizes, tBoardCell } from "../minesweeperGame";
+import exp from "node:constants";
 
 
 describe("MinesweeperGame", function () {
@@ -38,11 +39,18 @@ describe("MinesweeperGame", function () {
             expect(beginnerGame.realBoard[0].length).toEqual(gameBoardSizes.beginner.colNum)
             expect(beginnerGame.realBoard.length).toEqual(gameBoardSizes.beginner.rowNum)
 
-            for (let i = 0; i < gameBoardSizes.beginner.colNum; i++) {
-                for (let j = 0; j < gameBoardSizes.beginner.rowNum; j++) {
-                    expect(MinesweeperGame.isMineSurrounded(beginnerGame.realBoard, j, i)).toBeFalsy();
+
+            let mineCount = 0;
+            for (let col = 0; col < gameBoardSizes.beginner.colNum; col++) {
+                for (let row = 0; row < gameBoardSizes.beginner.rowNum; row++) {
+                    //No mine should be surrounded
+                    expect(MinesweeperGame.isMineSurrounded(beginnerGame.realBoard, row, col)).toBeFalsy();
+
+                    if(beginnerGame.realBoard[row][col] === "*") mineCount++
                 }
             }
+
+            expect(mineCount).toEqual(gameBoardSizes.beginner.mineAmt);
         });
 
         test("easy", function () {
@@ -51,11 +59,17 @@ describe("MinesweeperGame", function () {
             expect(easyGame.realBoard[0].length).toEqual(gameBoardSizes.easy.colNum)
             expect(easyGame.realBoard.length).toEqual(gameBoardSizes.easy.rowNum)
 
-            for (let i = 0; i < gameBoardSizes.easy.colNum; i++) {
-                for (let j = 0; j < gameBoardSizes.easy.rowNum; j++) {
-                    expect(MinesweeperGame.isMineSurrounded(easyGame.realBoard, j, i)).toBeFalsy();
+            let mineCount = 0;
+            for (let col = 0; col < gameBoardSizes.easy.colNum; col++) {
+                for (let row = 0; row < gameBoardSizes.easy.rowNum; row++) {
+                    //No mine should be surrounded
+                    expect(MinesweeperGame.isMineSurrounded(easyGame.realBoard, row, col)).toBeFalsy();
+
+                    if(easyGame.realBoard[row][col] === "*") mineCount++
                 }
             }
+
+            expect(mineCount).toEqual(gameBoardSizes.easy.mineAmt);
         });
 
         test("normal", function () {
@@ -64,11 +78,17 @@ describe("MinesweeperGame", function () {
             expect(normalGame.realBoard[0].length).toEqual(gameBoardSizes.normal.colNum)
             expect(normalGame.realBoard.length).toEqual(gameBoardSizes.normal.rowNum)
 
-            for (let i = 0; i < gameBoardSizes.normal.colNum; i++) {
-                for (let j = 0; j < gameBoardSizes.normal.rowNum; j++) {
-                    expect(MinesweeperGame.isMineSurrounded(normalGame.realBoard, j, i)).toBeFalsy();
+            let mineCount = 0;
+            for (let col = 0; col < gameBoardSizes.normal.colNum; col++) {
+                for (let row = 0; row < gameBoardSizes.normal.rowNum; row++) {
+                    //No mine should be surrounded
+                    expect(MinesweeperGame.isMineSurrounded(normalGame.realBoard, row, col)).toBeFalsy();
+
+                    if(normalGame.realBoard[row][col] === "*") mineCount++
                 }
             }
+
+            expect(mineCount).toEqual(gameBoardSizes.normal.mineAmt);
         });
 
         test("hard", function () {
@@ -77,11 +97,17 @@ describe("MinesweeperGame", function () {
             expect(hardGame.realBoard[0].length).toEqual(gameBoardSizes.hard.colNum)
             expect(hardGame.realBoard.length).toEqual(gameBoardSizes.hard.rowNum)
 
-            for (let i = 0; i < gameBoardSizes.hard.colNum; i++) {
-                for (let j = 0; j < gameBoardSizes.hard.rowNum; j++) {
-                    expect(MinesweeperGame.isMineSurrounded(hardGame.realBoard, j, i)).toBeFalsy();
+            let mineCount = 0;
+            for (let col = 0; col < gameBoardSizes.hard.colNum; col++) {
+                for (let row = 0; row < gameBoardSizes.hard.rowNum; row++) {
+                    //No mine should be surrounded
+                    expect(MinesweeperGame.isMineSurrounded(hardGame.realBoard, row, col)).toBeFalsy();
+
+                    if(hardGame.realBoard[row][col] === "*") mineCount++
                 }
             }
+
+            expect(mineCount).toEqual(gameBoardSizes.hard.mineAmt);
         });
 
         test("expert", function () {
@@ -90,11 +116,17 @@ describe("MinesweeperGame", function () {
             expect(expertGame.realBoard[0].length).toEqual(gameBoardSizes.expert.colNum)
             expect(expertGame.realBoard.length).toEqual(gameBoardSizes.expert.rowNum)
 
-            for (let i = 0; i < gameBoardSizes.expert.colNum; i++) {
-                for (let j = 0; j < gameBoardSizes.expert.rowNum; j++) {
-                    expect(MinesweeperGame.isMineSurrounded(expertGame.realBoard, j, i)).toBeFalsy();
+            let mineCount = 0;
+            for (let col = 0; col < gameBoardSizes.expert.colNum; col++) {
+                for (let row = 0; row < gameBoardSizes.expert.rowNum; row++) {
+                    //No mine should be surrounded
+                    expect(MinesweeperGame.isMineSurrounded(expertGame.realBoard, row, col)).toBeFalsy();
+
+                    if(expertGame.realBoard[row][col] === "*") mineCount++
                 }
             }
+
+            expect(mineCount).toEqual(gameBoardSizes.expert.mineAmt);
         });
 
         test("advanced", function () {
@@ -103,11 +135,17 @@ describe("MinesweeperGame", function () {
             expect(advancedGame.realBoard[0].length).toEqual(gameBoardSizes.advanced.colNum)
             expect(advancedGame.realBoard.length).toEqual(gameBoardSizes.advanced.rowNum)
 
-            for (let i = 0; i < gameBoardSizes.advanced.colNum; i++) {
-                for (let j = 0; j < gameBoardSizes.advanced.rowNum; j++) {
-                    expect(MinesweeperGame.isMineSurrounded(advancedGame.realBoard, j, i)).toBeFalsy();
+            let mineCount = 0;
+            for (let col = 0; col < gameBoardSizes.advanced.colNum; col++) {
+                for (let row = 0; row < gameBoardSizes.advanced.rowNum; row++) {
+                    //No mine should be surrounded
+                    expect(MinesweeperGame.isMineSurrounded(advancedGame.realBoard, row, col)).toBeFalsy();
+
+                    if(advancedGame.realBoard[row][col] === "*") mineCount++
                 }
             }
+
+            expect(mineCount).toEqual(gameBoardSizes.advanced.mineAmt);
         });
     });
 
