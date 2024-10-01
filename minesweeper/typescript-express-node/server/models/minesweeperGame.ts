@@ -56,9 +56,6 @@ class MinesweeperGame {
     }
 
     private updateMineNums(rowNum: number, colNum: number): void {
-        // Return if a mine
-        if (this.realBoard[rowNum][colNum] === "*") return;
-
         // Update user board with mine count
         const mineCount = this.countSurroundingMines(rowNum, colNum);
 
